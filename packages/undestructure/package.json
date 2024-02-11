@@ -8,6 +8,16 @@
   },
   "keywords": [],
   "author": "",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./babel-plugin": {
+      "import": "./dist/babel-plugin/index.js",
+      "types": "./dist/babel-plugin/index.d.ts"
+    }
+  },
   "license": "ISC",
   "dependencies": {
     "@babel/core": "^7.23.9",
