@@ -1,5 +1,12 @@
 # @rock-solid/undestructure
 
+## 0.2.2
+
+### Patch Changes
+
+- e6487aa: package.json repo linking
+- 31f4ff7: More accurate enforce type
+
 ## 0.2.1
 
 ### Patch Changes
