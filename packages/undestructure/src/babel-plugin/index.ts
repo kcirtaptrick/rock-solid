@@ -10,7 +10,7 @@ import UTypeAnnotation from "./UTypeAnnotation";
 
 export default function babelPluginUndestructure() {
   return {
-    name: "solid-undestructure",
+    name: "solid-undestructure" as const,
     visitor: {
       FunctionDeclaration: visitor,
       FunctionExpression: visitor,
@@ -26,6 +26,8 @@ babelPluginUndestructure.rollup = () => {
         ["@babel/plugin-syntax-typescript", { isTSX: true }],
         babelPluginUndestructure(),
       ],
+      extensions: [".tsx"],
+      babelHelpers: "bundled",
     }),
     {
       enforce: "pre",
