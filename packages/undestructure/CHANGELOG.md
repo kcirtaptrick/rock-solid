@@ -1,5 +1,12 @@
 # @rock-solid/undestructure
 
+## 0.2.1
+
+### Patch Changes
+
+- 1803e22: Fix rollup/vite config
+- 06759fd: Type improvements: reference babel types from core, enable tsup --experimental-dts
+
 ## 0.2.0
 
 ### Minor Changes
