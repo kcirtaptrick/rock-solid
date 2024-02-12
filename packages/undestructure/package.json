@@ -1,13 +1,21 @@
 {
   "name": "@rock-solid/undestructure",
   "version": "0.2.1",
-  "description": "",
+  "description": "Destructuring props in SolidJS",
   "scripts": {
     "prepublish": "tsup ./src/index.ts ./src/babel-plugin/index.ts --experimental-dts",
     "test": "vitest"
   },
   "keywords": [],
-  "author": "",
+  "author": "Patrick Wang (https://github.com/kcirtaptrick)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kcirtaptrick/rock-solid.git"
+  },
+  "homepage": "https://github.com/kcirtaptrick/rock-solid/tree/master/packages/undestructure#readme",
+  "bugs": {
+    "url": "https://github.com/kcirtaptrick/rock-solid/issues"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",
