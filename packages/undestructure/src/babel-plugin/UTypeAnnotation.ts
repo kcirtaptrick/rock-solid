@@ -1,7 +1,9 @@
-import { Identifier } from "@babel/types";
+import { types } from "@babel/core";
 
 namespace UTypeAnnotation {
-  export function identifier(typeAnnotation: Identifier["typeAnnotation"]) {
+  export function identifier(
+    typeAnnotation: types.Identifier["typeAnnotation"]
+  ) {
     if (typeAnnotation?.type !== "TSTypeAnnotation") return;
     if (typeAnnotation.typeAnnotation.type !== "TSTypeReference") return;
 

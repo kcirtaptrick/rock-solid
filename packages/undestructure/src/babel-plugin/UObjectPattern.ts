@@ -1,14 +1,8 @@
-import {
-  Identifier,
-  ObjectPattern,
-  Expression,
-  RestElement,
-  StringLiteral,
-} from "@babel/types";
+import { types } from "@babel/core";
 import UObjectProperty from "./UObjectProperty";
 
 namespace UObjectPattern {
-  export const defaults = (objectPattern: ObjectPattern) =>
+  export const defaults = (objectPattern: types.ObjectPattern) =>
     Object.fromEntries(
       objectPattern.properties.flatMap((prop) =>
         prop.type === "ObjectProperty" &&
@@ -19,14 +13,15 @@ namespace UObjectPattern {
     );
 
   const initialInfo = {
-    keys: () => [] as (Identifier | StringLiteral)[],
-    defaults: () => [] as [Identifier | StringLiteral, Expression][],
-    renames: () => ({}) as Record<string, Identifier>,
-    restElement: () => null as RestElement | null,
+    keys: () => [] as (types.Identifier | types.StringLiteral)[],
+    defaults: () =>
+      [] as [types.Identifier | types.StringLiteral, types.Expression][],
+    renames: () => ({}) as Record<string, types.Identifier>,
+    restElement: () => null as types.RestElement | null,
   };
 
   export function info<Include extends (keyof typeof initialInfo)[]>(
-    objectPattern: ObjectPattern,
+    objectPattern: types.ObjectPattern,
     include: Include = Object.keys(initialInfo) as never
   ) {
     const res = Object.fromEntries(

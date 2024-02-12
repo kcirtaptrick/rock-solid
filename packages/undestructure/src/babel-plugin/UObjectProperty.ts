@@ -1,15 +1,17 @@
-import { Identifier, StringLiteral, ObjectProperty } from "@babel/types";
+import { types } from "@babel/core";
 
 namespace UObjectProperty {
-  export type Key = ObjectProperty["key"];
+  export type Key = types.ObjectProperty["key"];
   export namespace Key {
-    export function isStatic(key: Key): key is Identifier | StringLiteral {
+    export function isStatic(
+      key: Key
+    ): key is types.Identifier | types.StringLiteral {
       return key.type === "Identifier" || key.type === "StringLiteral";
     }
     isStatic.assert = (
       key: Key,
       message = "Key must be static."
-    ): asserts key is Identifier | StringLiteral => {
+    ): asserts key is types.Identifier | types.StringLiteral => {
       if (!isStatic(key)) throw new NonStaticError(message);
     };
     export class NonStaticError extends Error {

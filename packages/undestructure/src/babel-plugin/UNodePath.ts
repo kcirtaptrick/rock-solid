@@ -1,21 +1,20 @@
 import { NodePath, types } from "@babel/core";
-import { Program, ImportSpecifier } from "@babel/types";
 import { Tuple } from "record-tuple";
 import UImportDeclaration from "./UImportDeclaration";
 import UMap from "./UMap";
 
 namespace UNodePath {
   export const findProgram = (nodePath: NodePath) =>
-    nodePath.findParent((path) => path.isProgram()) as NodePath<Program>;
+    nodePath.findParent((path) => path.isProgram()) as NodePath<types.Program>;
 
   export namespace Program {
     const importSpecifierCache = new Map<
-      NodePath<Program>,
-      Map<Tuple<[string, string]>, ImportSpecifier>
+      NodePath<types.Program>,
+      Map<Tuple<[string, string]>, types.ImportSpecifier>
     >();
 
     export const importSpecifier = {
-      find(programPath: NodePath<Program>, name: string, from: string) {
+      find(programPath: NodePath<types.Program>, name: string, from: string) {
         const pathCache = UMap.getOr.lazy(
           importSpecifierCache,
           programPath,
@@ -41,7 +40,11 @@ namespace UNodePath {
         return pathCache.get(key);
       },
       mut: {
-        insert(programPath: NodePath<Program>, name: string, from: string) {
+        insert(
+          programPath: NodePath<types.Program>,
+          name: string,
+          from: string
+        ) {
           const specifier = types.importSpecifier(
             programPath.scope.generateUidIdentifier(name),
             types.identifier(name)
@@ -52,7 +55,7 @@ namespace UNodePath {
           return specifier;
         },
         findOrInsert(
-          programPath: NodePath<Program>,
+          programPath: NodePath<types.Program>,
           name: string,
           from: string
         ) {

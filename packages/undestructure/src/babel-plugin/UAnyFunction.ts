@@ -1,23 +1,16 @@
 import { NodePath, types } from "@babel/core";
-import {
-  FunctionDeclaration,
-  ObjectPattern,
-  FunctionExpression,
-  ArrowFunctionExpression,
-  Statement,
-} from "@babel/types";
 
 type UAnyFunction =
-  | FunctionDeclaration
-  | FunctionExpression
-  | ArrowFunctionExpression;
+  | types.FunctionDeclaration
+  | types.FunctionExpression
+  | types.ArrowFunctionExpression;
 
 namespace UAnyFunction {
   export const params = {
     firstIsDestructured<F extends UAnyFunction>(
       fdNode: F
     ): fdNode is F & {
-      params: [ObjectPattern, ...F["params"]];
+      params: [types.ObjectPattern, ...F["params"]];
     } {
       const param = fdNode.params[0];
 
@@ -33,7 +26,7 @@ namespace UAnyFunction {
     export const mut = {
       prependStatement(
         path: NodePath<UAnyFunction>,
-        ...statements: Statement[]
+        ...statements: types.Statement[]
       ) {
         if (path.node.body.type === "BlockStatement")
           path.node.body.body.unshift(...statements);

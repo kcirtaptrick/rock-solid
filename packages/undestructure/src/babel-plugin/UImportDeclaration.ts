@@ -1,7 +1,7 @@
-import { ImportDeclaration } from "@babel/types";
+import { types } from "@babel/core";
 
 export namespace UImportDeclaration {
-  export type Specifier = ImportDeclaration["specifiers"][number];
+  export type Specifier = types.ImportDeclaration["specifiers"][number];
   export namespace Specifier {
     // TOOD: Finish implmentation
     export function name(specifier: Specifier) {
