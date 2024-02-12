@@ -1,4 +1,5 @@
 import { PluginItem, types, NodePath } from "@babel/core";
+import { babel } from "@rollup/plugin-babel";
 
 import UBinding from "./UBinding";
 import UAnyFunction from "./UAnyFunction";
@@ -9,7 +10,7 @@ import UTypeAnnotation from "./UTypeAnnotation";
 
 export default function babelPluginUndestructure() {
   return {
-    name: "babel-plugin-solid-undestructure",
+    name: "solid-undestructure",
     visitor: {
       FunctionDeclaration: visitor,
       FunctionExpression: visitor,
@@ -17,6 +18,22 @@ export default function babelPluginUndestructure() {
     },
   } satisfies PluginItem;
 }
+
+babelPluginUndestructure.rollup = () => {
+  return Object.assign(
+    babel({
+      plugins: [
+        ["@babel/plugin-syntax-typescript", { isTSX: true }],
+        babelPluginUndestructure(),
+      ],
+    }),
+    {
+      enforce: "pre",
+    } as const
+  );
+};
+
+babelPluginUndestructure.vite = babelPluginUndestructure.rollup;
 
 function visitor(path: NodePath<UAnyFunction>) {
   if (!path.node.params[0]) return;
