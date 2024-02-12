@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.2.0
+
+### Minor Changes
+
+- c0cc05b: Bundler support: rollup/vite
+
 ## 0.1.1
 
 ### Patch Changes
