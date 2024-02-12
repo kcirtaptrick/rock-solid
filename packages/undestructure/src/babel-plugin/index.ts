@@ -30,8 +30,8 @@ babelPluginUndestructure.rollup = () => {
       babelHelpers: "bundled",
     }),
     {
-      enforce: "pre",
-    } as const
+      enforce: "pre" as const,
+    }
   );
 };
 
