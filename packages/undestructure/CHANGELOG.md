@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.2.5
+
+### Patch Changes
+
+- 061398f: Publish global.d.ts to package
+
 ## 0.2.4
 
 ### Patch Changes
