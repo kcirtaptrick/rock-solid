@@ -64,6 +64,7 @@ describe("@rock-solid/undestructure", () => {
       `)
     );
   });
+
   test("Multiple props", async () => {
     expect(
       await format(
@@ -89,6 +90,29 @@ describe("@rock-solid/undestructure", () => {
       `)
     );
   });
+
+  test("Prop used in shorthand", async () => {
+    expect(
+      await format(
+        (await tsTransform(/*javascript*/ `
+          import { D } from "@rock-solid/undestructure";
+          
+          export default function Component({ a }: D<{a: string}>) {
+            const b = { a };
+          }
+        `))!.code!
+      )
+    ).toEqual(
+      await format(/*javascript*/ `
+        import { D } from "@rock-solid/undestructure";
+        
+        export default function Component(_props: D<{a: string}>) {
+          const b = { a: _props.a };
+        }
+      `)
+    );
+  });
+
   describe("Prop defaults", () => {
     test("Insert _mergeProps", async () => {
       expect(
@@ -387,8 +411,6 @@ describe("@rock-solid/undestructure", () => {
       )
     ).toEqual(
       await format(/*javascript*/ `
-        import { splitProps as _splitProps2 } from "solid-js";
-        import { mergeProps as _mergeProps2 } from "solid-js";
         import { splitProps as _splitProps } from "solid-js";
         import { mergeProps as _mergeProps } from "solid-js";
         import { D } from "@rock-solid/undestructure";
@@ -403,8 +425,8 @@ describe("@rock-solid/undestructure", () => {
         }
         function Component2(_props2: D) {
           let h;
-          [_props2, h] = _splitProps2(_props2, ["a", "d-e"]);
-          _props2 = _mergeProps2({ a: "c" }, _props2);
+          [_props2, h] = _splitProps(_props2, ["a", "d-e"]);
+          _props2 = _mergeProps({ a: "c" }, _props2);
           _props2.a;
           _props2["d-e"];
           h;

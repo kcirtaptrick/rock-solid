@@ -52,6 +52,17 @@ namespace UNodePath {
           programPath.node.body.unshift(
             types.importDeclaration([specifier], types.stringLiteral(from))
           );
+          // Only update if cache for programPath exists, otherwise program will
+          // be traversed on next find. We'll prevent this from happening if we
+          // create it here, but we also don't want to perform a traversal here
+          if (importSpecifierCache.has(programPath)) {
+            importSpecifierCache
+              .get(programPath)!
+              .set(
+                Tuple(UImportDeclaration.Specifier.name(specifier)!, from),
+                specifier
+              );
+          }
           return specifier;
         },
         findOrInsert(
