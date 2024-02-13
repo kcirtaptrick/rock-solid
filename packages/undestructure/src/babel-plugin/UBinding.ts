@@ -2,7 +2,7 @@ import { Binding } from "@babel/traverse";
 
 namespace UBinding {
   export function matchesImport(
-    binding: Binding,
+    binding: Binding | undefined,
     { name, from }: { name: string; from: string }
   ) {
     if (!binding) return false;

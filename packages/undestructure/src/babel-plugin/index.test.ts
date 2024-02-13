@@ -1,15 +1,24 @@
 import { test, expect, describe } from "vitest";
-import { transformAsync } from "@babel/core";
+import { TransformOptions, transformAsync } from "@babel/core";
 import babelPluginUndestructure from ".";
 import prettier from "prettier";
 
-const tsTransform: typeof transformAsync = (code, opts) =>
+const tsTransform = (
+  code: string,
+  {
+    babel = {} as TransformOptions,
+    undestructure = {} as babelPluginUndestructure.Options,
+  } = {}
+) =>
   transformAsync(code, {
-    plugins: ["@babel/plugin-syntax-typescript", babelPluginUndestructure()],
-    ...opts,
+    plugins: [
+      "@babel/plugin-syntax-typescript",
+      babelPluginUndestructure(undestructure),
+    ],
+    ...babel,
   });
 
-const format = (code: string) =>
+const normalize = (code: string) =>
   prettier.format(
     // Attempt deterministic output
     code.replace(/\s+/g, " "),
@@ -22,7 +31,7 @@ const format = (code: string) =>
 describe("@rock-solid/undestructure", () => {
   test("No transform", async () => {
     expect(
-      await format(
+      await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
@@ -33,7 +42,7 @@ describe("@rock-solid/undestructure", () => {
         `))!.code!
       )
     ).toEqual(
-      await format(/*javascript*/ `
+      await normalize(/*javascript*/ `
         import { D } from "@rock-solid/undestructure";
         
         export default function Component(props: D<{a: string, b: string}>) {
@@ -45,7 +54,7 @@ describe("@rock-solid/undestructure", () => {
   });
   test("Single prop", async () => {
     expect(
-      await format(
+      await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
@@ -55,7 +64,7 @@ describe("@rock-solid/undestructure", () => {
         `))!.code!
       )
     ).toEqual(
-      await format(/*javascript*/ `
+      await normalize(/*javascript*/ `
         import { D } from "@rock-solid/undestructure";
         
         export default function Component(_props: D<{a: string}>) {
@@ -67,7 +76,7 @@ describe("@rock-solid/undestructure", () => {
 
   test("Multiple props", async () => {
     expect(
-      await format(
+      await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
@@ -79,7 +88,7 @@ describe("@rock-solid/undestructure", () => {
         `))!.code!
       )
     ).toEqual(
-      await format(/*javascript*/ `
+      await normalize(/*javascript*/ `
         import { D } from "@rock-solid/undestructure";
         
         export default function Component(_props: D<{a: string, b: string, c: string}>) {
@@ -93,7 +102,7 @@ describe("@rock-solid/undestructure", () => {
 
   test("Prop used in shorthand", async () => {
     expect(
-      await format(
+      await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
@@ -103,7 +112,7 @@ describe("@rock-solid/undestructure", () => {
         `))!.code!
       )
     ).toEqual(
-      await format(/*javascript*/ `
+      await normalize(/*javascript*/ `
         import { D } from "@rock-solid/undestructure";
         
         export default function Component(_props: D<{a: string}>) {
@@ -116,7 +125,7 @@ describe("@rock-solid/undestructure", () => {
   describe("Prop defaults", () => {
     test("Insert _mergeProps", async () => {
       expect(
-        await format(
+        await normalize(
           (await tsTransform(/*javascript*/ `
             import { D } from "@rock-solid/undestructure";
             
@@ -128,7 +137,7 @@ describe("@rock-solid/undestructure", () => {
           `))!.code!
         )
       ).toEqual(
-        await format(/*javascript*/ `
+        await normalize(/*javascript*/ `
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -145,7 +154,7 @@ describe("@rock-solid/undestructure", () => {
     });
     test("Use existing mergeProps import", async () => {
       expect(
-        await format(
+        await normalize(
           (await tsTransform(/*javascript*/ `
             import { D } from "@rock-solid/undestructure";
             import { mergeProps } from "solid-js";
@@ -158,7 +167,7 @@ describe("@rock-solid/undestructure", () => {
           `))!.code!
         )
       ).toEqual(
-        await format(/*javascript*/ `
+        await normalize(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           import { mergeProps } from "solid-js";
           
@@ -175,7 +184,7 @@ describe("@rock-solid/undestructure", () => {
     });
     test("Use existing renamed mergeProps import", async () => {
       expect(
-        await format(
+        await normalize(
           (await tsTransform(/*javascript*/ `
             import { D } from "@rock-solid/undestructure";
             import { mergeProps as renamedMergeProps } from "solid-js";
@@ -188,7 +197,7 @@ describe("@rock-solid/undestructure", () => {
           `))!.code!
         )
       ).toEqual(
-        await format(/*javascript*/ `
+        await normalize(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           import { mergeProps as renamedMergeProps } from "solid-js";
           
@@ -207,7 +216,7 @@ describe("@rock-solid/undestructure", () => {
   describe("Rest param", () => {
     test("Insert _splitProps", async () => {
       expect(
-        await format(
+        await normalize(
           (await tsTransform(/*javascript*/ `
             import { D } from "@rock-solid/undestructure";
             
@@ -219,7 +228,7 @@ describe("@rock-solid/undestructure", () => {
           `))!.code!
         )
       ).toEqual(
-        await format(/*javascript*/ `
+        await normalize(/*javascript*/ `
           import { splitProps as _splitProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -237,7 +246,7 @@ describe("@rock-solid/undestructure", () => {
     });
     test("Use existing splitProps import", async () => {
       expect(
-        await format(
+        await normalize(
           (await tsTransform(/*javascript*/ `
             import { D } from "@rock-solid/undestructure";
             import { splitProps } from "solid-js";
@@ -250,7 +259,7 @@ describe("@rock-solid/undestructure", () => {
           `))!.code!
         )
       ).toEqual(
-        await format(/*javascript*/ `
+        await normalize(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           import { splitProps } from "solid-js";
           
@@ -268,7 +277,7 @@ describe("@rock-solid/undestructure", () => {
     });
     test("Use existing renamed splitProps import", async () => {
       expect(
-        await format(
+        await normalize(
           (await tsTransform(/*javascript*/ `
             import { D } from "@rock-solid/undestructure";
             import { splitProps as renamedSplitProps } from "solid-js";
@@ -281,7 +290,7 @@ describe("@rock-solid/undestructure", () => {
           `))!.code!
         )
       ).toEqual(
-        await format(/*javascript*/ `
+        await normalize(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           import { splitProps as renamedSplitProps } from "solid-js";
           
@@ -300,7 +309,7 @@ describe("@rock-solid/undestructure", () => {
   });
   test("Prop renames", async () => {
     expect(
-      await format(
+      await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
@@ -312,7 +321,7 @@ describe("@rock-solid/undestructure", () => {
         `))!.code!
       )
     ).toEqual(
-      await format(/*javascript*/ `
+      await normalize(/*javascript*/ `
         import { D } from "@rock-solid/undestructure";
         
         export default function Component(_props: D<{a: string, b: string, c: string}>) {
@@ -325,7 +334,7 @@ describe("@rock-solid/undestructure", () => {
   });
   test("String keys", async () => {
     expect(
-      await format(
+      await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
@@ -337,7 +346,7 @@ describe("@rock-solid/undestructure", () => {
         `))!.code!
       )
     ).toEqual(
-      await format(/*javascript*/ `
+      await normalize(/*javascript*/ `
         import { D } from "@rock-solid/undestructure";
         
         export default function Component(_props: D<{a: string, "b-b": string, "c.c": string}>) {
@@ -350,7 +359,7 @@ describe("@rock-solid/undestructure", () => {
   });
   test("Dynamic key throws", async () => {
     expect(async () => {
-      await format(
+      await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
@@ -363,7 +372,7 @@ describe("@rock-solid/undestructure", () => {
   });
   test("All at once", async () => {
     expect(
-      await format(
+      await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
@@ -375,7 +384,7 @@ describe("@rock-solid/undestructure", () => {
         `))!.code!
       )
     ).toEqual(
-      await format(/*javascript*/ `
+      await normalize(/*javascript*/ `
         import { splitProps as _splitProps } from "solid-js";
         import { mergeProps as _mergeProps } from "solid-js";
         import { D } from "@rock-solid/undestructure";
@@ -393,7 +402,7 @@ describe("@rock-solid/undestructure", () => {
   });
   test("Multiple components", async () => {
     expect(
-      await format(
+      await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
@@ -410,7 +419,7 @@ describe("@rock-solid/undestructure", () => {
         `))!.code!
       )
     ).toEqual(
-      await format(/*javascript*/ `
+      await normalize(/*javascript*/ `
         import { splitProps as _splitProps } from "solid-js";
         import { mergeProps as _mergeProps } from "solid-js";
         import { D } from "@rock-solid/undestructure";
@@ -433,5 +442,71 @@ describe("@rock-solid/undestructure", () => {
         }
       `)
     );
+  });
+
+  describe("Global type marker", () => {
+    test("With global option", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(
+            /*javascript*/ `
+              export default function Component({ a }: D<{a: string}>) {
+                a;
+              }
+            `,
+            { undestructure: { typeMarker: { name: "D", from: "<global>" } } }
+          ))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          export default function Component(_props: D<{a: string}>) {
+            _props.a;
+          }
+        `)
+      );
+    });
+
+    test("Without global option", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(/*javascript*/ `
+            export default function Component({ a }: D<{a: string}>) {
+              a;
+            }
+          `))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          export default function Component({ a }: D<{a: string}>) {
+            a;
+          }
+        `)
+      );
+    });
+
+    test("With global option, from import", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(
+            /*javascript*/ `
+              import { D } from "@rock-solid/undestructure";
+
+              export default function Component({ a }: D<{a: string}>) {
+                a;
+              }
+            `,
+            { undestructure: { typeMarker: { name: "D", from: "<global>" } } }
+          ))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          import { D } from "@rock-solid/undestructure";
+
+          export default function Component({ a }: D<{a: string}>) {
+            a;
+          }
+        `)
+      );
+    });
   });
 });
