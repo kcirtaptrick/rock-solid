@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.2.4
+
+### Patch Changes
+
+- 1109014: Provide global type declaration
+
 ## 0.2.3
 
 ### Patch Changes
