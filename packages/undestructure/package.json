@@ -1,6 +1,6 @@
 {
   "name": "@rock-solid/undestructure",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Destructuring props in SolidJS",
   "scripts": {
     "prepublish": "tsup ./src/index.ts ./src/babel-plugin/index.ts --experimental-dts; cp ./src/global.d.ts ./dist",

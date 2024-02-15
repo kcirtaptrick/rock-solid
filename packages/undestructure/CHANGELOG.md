@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.3.0
+
+### Minor Changes
+
+- 96b4b24: Add support for variable declaration destructuring
+
 ## 0.2.5
 
 ### Patch Changes
