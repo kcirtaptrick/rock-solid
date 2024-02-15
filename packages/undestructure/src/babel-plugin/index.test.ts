@@ -282,10 +282,10 @@ describe("@rock-solid/undestructure", () => {
             import { D } from "@rock-solid/undestructure";
             import { splitProps as renamedSplitProps } from "solid-js";
             
-            export default function Component({ a, b, ...c }: D<{a: string, b: string, c: string}>) {
+            export default function Component({ a, b, ...props }: D<{a: string, b: string, c: string}>) {
               a;
               b;
-              c;
+              props;
             }
           `))!.code!
         )
@@ -297,11 +297,11 @@ describe("@rock-solid/undestructure", () => {
           export default function Component(
             _props: D<{ a: string; b: string; c: string }>,
           ) {
-            let c;
-            [_props, c] = renamedSplitProps(_props, ["a", "b"]);
+            let props;
+            [_props, props] = renamedSplitProps(_props, ["a", "b"]);
             _props.a;
             _props.b;
-            c;
+            props;
           }
         `)
       );
@@ -504,6 +504,140 @@ describe("@rock-solid/undestructure", () => {
 
           export default function Component({ a }: D<{a: string}>) {
             a;
+          }
+        `)
+      );
+    });
+  });
+
+  describe("Variable destructuring", () => {
+    test("Basic", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(/*javascript*/ `
+            import { D } from "@rock-solid/undestructure";
+            
+            interface ComponentProps {
+              a: string;
+              b: string;
+            }
+
+            export default function Component(props: ComponentProps) {
+              const { a, b } = props satisfies D;
+              a;
+              b;
+            }
+          `))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          import { D } from "@rock-solid/undestructure";
+          
+          interface ComponentProps {
+            a: string;
+            b: string;
+          }
+
+          export default function Component(props: ComponentProps) {
+            let _props = props satisfies D;
+            _props.a;
+            _props.b;
+          }
+        `)
+      );
+    });
+    test("With statement insertion", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(/*javascript*/ `
+            import { D } from "@rock-solid/undestructure";
+            
+            interface ComponentProps {
+              a: string;
+              b: string;
+            }
+
+            export default function Component(props: ComponentProps) {
+              const { a: aa = "a", b, ...rest } = props satisfies D;
+              aa;
+              b;
+              rest;
+            }
+          `))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          import { splitProps as _splitProps } from "solid-js";
+          import { mergeProps as _mergeProps } from "solid-js";
+          import { D } from "@rock-solid/undestructure";
+          
+          interface ComponentProps {
+            a: string;
+            b: string;
+          }
+
+          export default function Component(props: ComponentProps) {
+            let _props = props satisfies D;
+            let rest;
+            [_props, rest] = _splitProps(_props, ["a", "b"]);
+            _props = _mergeProps({ a: "a" }, _props);
+            _props.a;
+            _props.b;
+            rest;
+          }
+        `)
+      );
+    });
+    test("With props destructure", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(/*javascript*/ `
+            import { D } from "@rock-solid/undestructure";
+            
+            interface ComponentProps {
+              a: string;
+              b: string;
+              c: string;
+              d: string;
+              e: string;
+            }
+
+            export default function Component({ a, b, ...props }: D<ComponentProps>) {
+              const { c, d, ..._props } = props satisfies D;
+              a;
+              b;
+              c;
+              d;
+              props;
+              _props;
+            }
+          `))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          import { splitProps as _splitProps } from "solid-js";
+          import { D } from "@rock-solid/undestructure";
+
+          interface ComponentProps {
+            a: string;
+            b: string;
+            c: string;
+            d: string;
+            e: string;
+          }
+
+          export default function Component(_props2: D<ComponentProps>) {
+            let props;
+            [_props2, props] = _splitProps(_props2, ["a", "b"]);
+            let _props3 = props satisfies D;
+            let _props;
+            [_props3, _props] = _splitProps(_props3, ["c", "d"]);
+            _props2.a;
+            _props2.b;
+            _props3.c;
+            _props3.d;
+            props;
+            _props;
           }
         `)
       );

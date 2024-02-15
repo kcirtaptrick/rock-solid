@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "undestructure": "pnpm --filter @rock-solid/undestructure"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

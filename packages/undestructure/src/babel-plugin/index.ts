@@ -2,11 +2,12 @@ import { PluginItem, types, NodePath } from "@babel/core";
 import { babel } from "@rollup/plugin-babel";
 
 import UBinding from "./UBinding";
-import UAnyFunction from "./UAnyFunction";
+import UFunctionNode from "./UFunctionNode";
 import UNodePath from "./UNodePath";
 import UObjectPattern from "./UObjectPattern";
 import UObjectProperty from "./UObjectProperty";
 import UTypeAnnotation from "./UTypeAnnotation";
+import UTSType from "./UTSType";
 
 declare namespace babelPluginUndestructure {
   type Options = {
@@ -23,57 +24,103 @@ function babelPluginUndestructure(
   return {
     name: "solid-undestructure" as const,
     visitor: {
-      FunctionDeclaration: visitor,
-      FunctionExpression: visitor,
-      ArrowFunctionExpression: visitor,
+      ...Object.fromEntries(
+        UFunctionNode.typeNames.map((type) => [
+          type,
+          (path: NodePath<UFunctionNode>) => {
+            const param = path.node.params[0];
+            if (param?.type !== "ObjectPattern") return;
+
+            const typeIdentifier = UTypeAnnotation.identifier(
+              param.typeAnnotation
+            );
+            if (!validTypeIdentifier(typeIdentifier, path)) return;
+
+            const propsIdentifier = undestructure(param, {
+              path,
+              insertStatments(...statements) {
+                UFunctionNode.Path.mut.prependStatement(path, ...statements);
+              },
+            });
+
+            propsIdentifier.typeAnnotation = param.typeAnnotation;
+            path.node.params[0] = propsIdentifier;
+          },
+        ])
+      ),
+      TSSatisfiesExpression(path) {
+        if (path.parent.type !== "VariableDeclarator") return;
+        if (path.parent.id.type !== "ObjectPattern") return;
+
+        const typeIdentifier = UTSType.identifier(path.node.typeAnnotation);
+        if (!validTypeIdentifier(typeIdentifier, path)) return;
+
+        const propsIdentifier = undestructure(path.parent.id, {
+          path,
+          insertStatments(...statements) {
+            path.parentPath!.parentPath!.insertAfter(statements);
+          },
+        });
+
+        const declaration = path.parentPath.parent;
+        if (
+          declaration.type === "VariableDeclaration" &&
+          declaration.kind === "const"
+        )
+          declaration.kind = "let";
+        path.parent.id = propsIdentifier;
+      },
     },
   } satisfies PluginItem;
 
-  function visitor(path: NodePath<UAnyFunction>) {
-    if (!path.node.params[0]) return;
+  function validTypeIdentifier(
+    typeIdentifier: types.Identifier | undefined,
+    path: NodePath
+  ) {
+    if (!typeIdentifier) return;
 
-    // Check for type marker
-    {
-      const typeIdentifier = UTypeAnnotation.identifier(
-        path.node.params[0].typeAnnotation
-      );
-
-      if (!typeIdentifier) return;
-
-      if (options.typeMarker?.from === "<global>") {
-        if (path.scope.getAllBindings()[typeIdentifier.name]) return;
-      } else if (
-        !UBinding.matchesImport(
-          path.scope.getAllBindingsOfKind("module")[typeIdentifier.name],
-          {
-            name: options.typeMarker?.name || "D",
-            from: options.typeMarker?.from || "@rock-solid/undestructure",
-          }
-        )
+    if (options.typeMarker?.from === "<global>") {
+      if (path.scope.getAllBindings()[typeIdentifier.name]) return;
+    } else if (
+      !UBinding.matchesImport(
+        path.scope.getAllBindingsOfKind("module")[typeIdentifier.name],
+        {
+          name: options.typeMarker?.name || "D",
+          from: options.typeMarker?.from || "@rock-solid/undestructure",
+        }
       )
-        return;
+    )
+      return;
+    return true;
+  }
+
+  function undestructure(
+    objectPattern: types.ObjectPattern,
+    {
+      path,
+      insertStatments,
+    }: {
+      path: NodePath;
+      insertStatments: (...statements: types.Statement[]) => void;
     }
+  ) {
+    const { defaults, renames, keys, restElement } =
+      UObjectPattern.info(objectPattern);
 
-    if (!UAnyFunction.params.firstIsDestructured(path.node)) return;
+    const program = UNodePath.findProgram(path);
 
-    const param = path.node.params[0];
-    const { defaults, renames, keys, restElement } = UObjectPattern.info(param);
-
-    const propsIdentifier =
-      UNodePath.findProgram(path).scope.generateUidIdentifier("props");
-    propsIdentifier.typeAnnotation = param.typeAnnotation;
+    const propsIdentifier = program.scope.generateUidIdentifier("props");
 
     // mergeProps
     if (defaults.length > 0) {
       const mergePropsSpecifier =
         UNodePath.Program.importSpecifier.mut.findOrInsert(
-          UNodePath.findProgram(path),
+          program,
           "mergeProps",
           "solid-js"
         );
 
-      UAnyFunction.Path.mut.prependStatement(
-        path,
+      insertStatments(
         types.expressionStatement(
           types.assignmentExpression(
             "=",
@@ -93,13 +140,12 @@ function babelPluginUndestructure(
     if (restElement) {
       const splitPropsSpecifier =
         UNodePath.Program.importSpecifier.mut.findOrInsert(
-          UNodePath.findProgram(path),
+          program,
           "splitProps",
           "solid-js"
         );
 
-      UAnyFunction.Path.mut.prependStatement(
-        path,
+      insertStatments(
         types.variableDeclaration("let", [
           types.variableDeclarator(restElement.argument),
         ]),
@@ -144,8 +190,7 @@ function babelPluginUndestructure(
       //     constantViolation.node.left = undestructuredProp;
     }
 
-    // @ts-ignore Previously narrowed type must be widened again
-    path.node.params[0] = propsIdentifier;
+    return propsIdentifier;
   }
 }
 
