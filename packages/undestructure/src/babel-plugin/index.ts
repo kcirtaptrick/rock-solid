@@ -8,6 +8,7 @@ import UObjectPattern from "./UObjectPattern";
 import UObjectProperty from "./UObjectProperty";
 import UTypeAnnotation from "./UTypeAnnotation";
 import UTSType from "./UTSType";
+import UProgram from "./UProgram";
 
 declare namespace babelPluginUndestructure {
   type Options = {
@@ -58,7 +59,7 @@ function babelPluginUndestructure(
         const propsIdentifier = undestructure(path.parent.id, {
           path,
           insertStatments(...statements) {
-            path.parentPath!.parentPath!.insertAfter(statements);
+            path.parentPath.parentPath!.insertAfter(statements);
           },
         });
 
@@ -114,7 +115,7 @@ function babelPluginUndestructure(
     // mergeProps
     if (defaults.length > 0) {
       const mergePropsSpecifier =
-        UNodePath.Program.importSpecifier.mut.findOrInsert(
+        UProgram.Path.importSpecifier.mut.findOrInsert(
           program,
           "mergeProps",
           "solid-js"
@@ -139,7 +140,7 @@ function babelPluginUndestructure(
     // splitProps
     if (restElement) {
       const splitPropsSpecifier =
-        UNodePath.Program.importSpecifier.mut.findOrInsert(
+        UProgram.Path.importSpecifier.mut.findOrInsert(
           program,
           "splitProps",
           "solid-js"
