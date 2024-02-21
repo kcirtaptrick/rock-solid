@@ -2,7 +2,7 @@ import { PluginItem, types, NodePath } from "@babel/core";
 import { babel } from "@rollup/plugin-babel";
 
 import UBinding from "./UBinding";
-import UFunctionNode from "./UFunctionNode";
+import UFunctionLike from "./UFunctionLike";
 import UNodePath from "./UNodePath";
 import UObjectPattern from "./UObjectPattern";
 import UObjectProperty from "./UObjectProperty";
@@ -26,9 +26,9 @@ function babelPluginUndestructure(
     name: "solid-undestructure" as const,
     visitor: {
       ...Object.fromEntries(
-        UFunctionNode.typeNames.map((type) => [
+        UFunctionLike.typeNames.map((type) => [
           type,
-          (path: NodePath<UFunctionNode>) => {
+          (path: NodePath<UFunctionLike>) => {
             const param = path.node.params[0];
             if (param?.type !== "ObjectPattern") return;
 
@@ -40,7 +40,7 @@ function babelPluginUndestructure(
             const propsIdentifier = undestructure(param, {
               path,
               insertStatments(...statements) {
-                UFunctionNode.Path.mut.prependStatement(path, ...statements);
+                UFunctionLike.Path.mut.prependStatement(path, ...statements);
               },
             });
 

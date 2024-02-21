@@ -1,19 +1,22 @@
 import { Node, NodePath, types } from "@babel/core";
 
-type UFunctionNode = Extract<
+type UFunctionLike = Extract<
   Node,
-  { type: (typeof UFunctionNode.typeNames)[number] }
+  { type: (typeof UFunctionLike.typeNames)[number] }
 >;
 
-namespace UFunctionNode {
+namespace UFunctionLike {
   export const typeNames = [
     "FunctionDeclaration",
     "FunctionExpression",
     "ArrowFunctionExpression",
+    "ObjectMethod",
+    "ClassMethod",
+    "ClassPrivateMethod",
   ] satisfies Node["type"][];
 
   export const params = {
-    firstIsDestructured<F extends UFunctionNode>(
+    firstIsDestructured<F extends UFunctionLike>(
       fdNode: F
     ): fdNode is F & {
       params: [types.ObjectPattern, ...F["params"]];
@@ -31,7 +34,7 @@ namespace UFunctionNode {
   export namespace Path {
     export const mut = {
       prependStatement(
-        path: NodePath<UFunctionNode>,
+        path: NodePath<UFunctionLike>,
         ...statements: types.Statement[]
       ) {
         if (path.node.body.type === "BlockStatement")
@@ -46,4 +49,4 @@ namespace UFunctionNode {
   }
 }
 
-export default UFunctionNode;
+export default UFunctionLike;
