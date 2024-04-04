@@ -1,5 +1,12 @@
 # @rock-solid/undestructure
 
+## 0.3.1
+
+### Patch Changes
+
+- f143f04: UFunctionNode -> UFunctionLike
+- a9bd7db: Include esm bundle
+
 ## 0.3.0
 
 ### Minor Changes
