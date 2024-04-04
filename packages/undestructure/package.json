@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "description": "Destructuring props in SolidJS",
   "scripts": {
-    "prepublish": "tsup ./src/index.ts ./src/babel-plugin/index.ts --experimental-dts; cp ./src/global.d.ts ./dist",
+    "prepublish": "tsup ./src/index.ts ./src/babel-plugin/index.ts --format esm,cjs --experimental-dts; cp ./src/global.d.ts ./dist",
     "test": "vitest"
   },
   "keywords": [],
@@ -18,11 +18,13 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "default": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },
     "./babel-plugin": {
-      "import": "./dist/babel-plugin/index.js",
+      "default": "./dist/babel-plugin/index.js",
+      "import": "./dist/babel-plugin/index.mjs",
       "types": "./dist/babel-plugin/index.d.ts"
     },
     "./dist/global.d.ts": {
