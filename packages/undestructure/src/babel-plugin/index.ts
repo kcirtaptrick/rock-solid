@@ -81,6 +81,7 @@ function babelPluginUndestructure(
     if (!typeIdentifier) return;
 
     if (options.typeMarker?.from === "<global>") {
+      if (typeIdentifier.name !== "D") return;
       if (path.scope.getAllBindings()[typeIdentifier.name]) return;
     } else if (
       !UBinding.matchesImport(

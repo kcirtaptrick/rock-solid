@@ -466,6 +466,29 @@ describe("@rock-solid/undestructure", () => {
       );
     });
 
+    test("With global option, without marker", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(
+            /*javascript*/ `
+              type ComponentProps = {a: string};
+              export default function Component({ a }: ComponentProps) {
+                a;
+              }
+            `,
+            { undestructure: { typeMarker: { name: "D", from: "<global>" } } }
+          ))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          type ComponentProps = {a: string};
+          export default function Component({ a }: ComponentProps) {
+            a;
+          }
+        `)
+      );
+    });
+
     test("Without global option", async () => {
       expect(
         await normalize(
