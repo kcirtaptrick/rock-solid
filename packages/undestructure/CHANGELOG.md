@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.3.2
+
+### Patch Changes
+
+- 1aee8dd: Add global type marker name check
+
 ## 0.3.1
 
 ### Patch Changes
