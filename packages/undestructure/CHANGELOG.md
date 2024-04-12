@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.3.3
+
+### Patch Changes
+
+- 4489df9: Fix exports
+
 ## 0.3.2
 
 ### Patch Changes
