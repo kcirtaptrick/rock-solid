@@ -18,12 +18,12 @@
   },
   "exports": {
     ".": {
-      "default": "./dist/index.js",
+      "require": "./dist/index.js",
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },
     "./babel-plugin": {
-      "default": "./dist/babel-plugin/index.js",
+      "require": "./dist/babel-plugin/index.js",
       "import": "./dist/babel-plugin/index.mjs",
       "types": "./dist/babel-plugin/index.d.ts"
     },
