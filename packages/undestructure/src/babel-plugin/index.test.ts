@@ -100,6 +100,30 @@ describe("@rock-solid/undestructure", () => {
     );
   });
 
+  test("With nested generic", async () => {
+    expect(
+      await normalize(
+        (await tsTransform(/*javascript*/ `
+          import { D } from "@rock-solid/undestructure";
+          
+          export default function Component({ a, children }: D<FlowProps<{a: string}>>) {
+            a;
+            children;
+          }
+        `))!.code!
+      )
+    ).toEqual(
+      await normalize(/*javascript*/ `
+        import { D } from "@rock-solid/undestructure";
+        
+        export default function Component(_props: D<FlowProps<{a: string}>>) {
+          _props.a;
+          _props.children;
+        }
+      `)
+    );
+  });
+
   test("Prop used in shorthand", async () => {
     expect(
       await normalize(
