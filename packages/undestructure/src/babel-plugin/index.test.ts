@@ -238,7 +238,7 @@ describe("@rock-solid/undestructure", () => {
         `)
       );
     });
-    test.only("Derived default prop", async () => {
+    test("Derived default prop", async () => {
       expect(
         await normalize(
           (await tsTransform(/*javascript*/ `
