@@ -9,6 +9,7 @@ import UObjectProperty from "./UObjectProperty";
 import UTypeAnnotation from "./UTypeAnnotation";
 import UTSType from "./UTSType";
 import UProgram from "./UProgram";
+import UNode from "./UNode";
 
 declare namespace babelPluginUndestructure {
   type Options = {
@@ -129,7 +130,21 @@ function babelPluginUndestructure(
             propsIdentifier,
             types.callExpression(mergePropsSpecifier.local, [
               types.objectExpression(
-                defaults.map(([key, value]) => types.objectProperty(key, value))
+                defaults.map(([key, value]) => {
+                  if (
+                    !UNode.findChild(
+                      value,
+                      (node) => node.type === "Identifier"
+                    )
+                  )
+                    return types.objectProperty(key, value);
+                  return types.objectMethod(
+                    "get",
+                    key,
+                    [],
+                    types.blockStatement([types.returnStatement(value)])
+                  );
+                })
               ),
               propsIdentifier,
             ])

@@ -2,6 +2,8 @@ import { test, expect, describe } from "vitest";
 import { TransformOptions, transformAsync } from "@babel/core";
 import babelPluginUndestructure from ".";
 import prettier from "prettier";
+import { parse } from "@babel/parser";
+import { inspect } from "util";
 
 const tsTransform = (
   code: string,
@@ -232,6 +234,41 @@ describe("@rock-solid/undestructure", () => {
             _props.a;
             _props.b;
             _props.c;
+          }
+        `)
+      );
+    });
+    test.only("Derived default prop", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(/*javascript*/ `
+            import { D } from "@rock-solid/undestructure";
+            
+            export default function Component({ a = "a", b = a }: D<{a: string, b: string}>) {
+              a;
+              b;
+            }
+          `))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          import { mergeProps as _mergeProps } from "solid-js";
+          import { D } from "@rock-solid/undestructure";
+          
+          export default function Component(
+            _props: D<{ a: string; b: string; }>,
+          ) {
+            _props = _mergeProps(
+              {
+                a: "a",
+                get b() {
+                  return a;
+                },
+              },
+              _props,
+            );
+            _props.a;
+            _props.b;
           }
         `)
       );

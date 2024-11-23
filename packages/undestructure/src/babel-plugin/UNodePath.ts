@@ -1,4 +1,5 @@
-import { NodePath, types } from "@babel/core";
+import { NodePath, traverse, types } from "@babel/core";
+import UProgram from "./UProgram";
 
 namespace UNodePath {
   export const findProgram = (nodePath: NodePath) =>
