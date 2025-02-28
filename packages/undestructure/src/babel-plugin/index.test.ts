@@ -262,7 +262,42 @@ describe("@rock-solid/undestructure", () => {
               {
                 a: "a",
                 get b() {
-                  return a;
+                  return _props.a;
+                },
+              },
+              _props,
+            );
+            _props.a;
+            _props.b;
+          }
+        `)
+      );
+    });
+    test("Derived default prop with rename", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(/*javascript*/ `
+            import { D } from "@rock-solid/undestructure";
+            
+            export default function Component({ a: aa = "a", b = aa }: D<{a: string, b: string}>) {
+              aa;
+              b;
+            }
+          `))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          import { mergeProps as _mergeProps } from "solid-js";
+          import { D } from "@rock-solid/undestructure";
+          
+          export default function Component(
+            _props: D<{ a: string; b: string; }>,
+          ) {
+            _props = _mergeProps(
+              {
+                a: "a",
+                get b() {
+                  return _props.a;
                 },
               },
               _props,
@@ -722,6 +757,54 @@ describe("@rock-solid/undestructure", () => {
             _props3.d;
             props;
             _props;
+          }
+        `)
+      );
+    });
+
+    test("With derived defaults", async () => {
+      expect(
+        await normalize(
+          (await tsTransform(/*javascript*/ `
+            import { D } from "@rock-solid/undestructure";
+            
+            interface ComponentProps {
+              a: string;
+              b: string;
+            }
+
+            export default function Component(props: ComponentProps) {
+              const { a: aa = "a", b = aa, ...rest } = props satisfies D;
+              aa;
+              b;
+              rest;
+            }
+          `))!.code!
+        )
+      ).toEqual(
+        await normalize(/*javascript*/ `
+          import { splitProps as _splitProps } from "solid-js";
+          import { mergeProps as _mergeProps } from "solid-js";
+          import { D } from "@rock-solid/undestructure";
+          
+          interface ComponentProps {
+            a: string;
+            b: string;
+          }
+
+          export default function Component(props: ComponentProps) {
+            let _props = props satisfies D;
+            let rest;
+            [_props, rest] = _splitProps(_props, ["a", "b"]);
+            _props = _mergeProps({
+              a: "a",
+              get b() {
+                return _props.a;
+              },
+             }, _props);
+            _props.a;
+            _props.b;
+            rest;
           }
         `)
       );

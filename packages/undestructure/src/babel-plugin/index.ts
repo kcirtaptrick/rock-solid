@@ -191,8 +191,9 @@ function babelPluginUndestructure(
         prop.type === "StringLiteral"
       );
 
-      // TODO: Find purpose
-      // path.scope.crawl();
+      // Find new bindings for identifiers added in transforms above
+      // - Derived defaults
+      path.scope.crawl();
       const componentScopeBindings = path.scope.bindings;
       const keyName = UObjectProperty.Key.staticName(prop);
       const { referencePaths, constantViolations } =
