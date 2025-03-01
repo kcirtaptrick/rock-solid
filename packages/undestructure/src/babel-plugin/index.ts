@@ -9,6 +9,7 @@ import UTypeAnnotation from "./UTypeAnnotation";
 import UTSType from "./UTSType";
 import UProgram from "./UProgram";
 import UNode from "./UNode";
+import generator from "@babel/generator";
 
 declare namespace babelPluginUndestructure {
   type Options = {
@@ -149,7 +150,9 @@ function babelPluginUndestructure(
                       "solid-js"
                     );
                   const memoIdentifier = program.scope.generateUidIdentifier(
-                    key.type === "StringLiteral" ? key.value : undefined
+                    key.type === "StringLiteral"
+                      ? key.value
+                      : generator(key).code
                   );
                   memos.push(
                     types.variableDeclaration("const", [
@@ -171,7 +174,8 @@ function babelPluginUndestructure(
                       types.returnStatement(
                         types.callExpression(memoIdentifier, [])
                       ),
-                    ])
+                    ]),
+                    key.type !== "StringLiteral"
                   );
                 })
               ),

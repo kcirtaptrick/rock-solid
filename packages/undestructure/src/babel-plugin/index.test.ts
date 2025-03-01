@@ -279,9 +279,9 @@ describe("@rock-solid/undestructure", () => {
           (await tsTransform(/*javascript*/ `
             import { D } from "@rock-solid/undestructure";
             
-            export default function Component({ a: aa = "a", b = aa }: D<{a: string, b: string}>) {
+            export default function Component({ a: aa = "a", [b + c]: bc = aa }: D<{a: string, b: string}>) {
               aa;
-              b;
+              bc;
             }
           `))!.code!
         )
@@ -297,15 +297,15 @@ describe("@rock-solid/undestructure", () => {
             _props = _mergeProps(
               {
                 a: "a",
-                get b() {
-                  return _b();
+                get [b + c]() {
+                  return _bC();
                 },
               },
               _props,
             );
-            const _b = _createMemo(() => _props.a);
+            const _bC = _createMemo(() => _props.a);
             _props.a;
-            _props.b;
+            _props[b + c];
           }
         `)
       );
