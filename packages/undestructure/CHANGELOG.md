@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.5.2
+
+### Patch Changes
+
+- d08ae6d: Fix computed key with derived default
+
 ## 0.5.1
 
 ### Patch Changes
