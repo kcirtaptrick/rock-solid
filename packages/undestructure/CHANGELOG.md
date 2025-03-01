@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.5.1
+
+### Patch Changes
+
+- 6ea6a9f: Support computed key destructuring
+
 ## 0.5.0
 
 ### Minor Changes
