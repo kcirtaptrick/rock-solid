@@ -2,8 +2,6 @@ import { test, expect, describe } from "vitest";
 import { TransformOptions, transformAsync } from "@babel/core";
 import babelPluginUndestructure from ".";
 import prettier from "prettier";
-import { parse } from "@babel/parser";
-import { inspect } from "util";
 
 const tsTransform = (
   code: string,
@@ -252,6 +250,7 @@ describe("@rock-solid/undestructure", () => {
         )
       ).toEqual(
         await normalize(/*javascript*/ `
+          import { createMemo as _createMemo } from "solid-js";
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -262,11 +261,12 @@ describe("@rock-solid/undestructure", () => {
               {
                 a: "a",
                 get b() {
-                  return _props.a;
+                  return _b();
                 },
               },
               _props,
             );
+            const _b = _createMemo(() => _props.a);
             _props.a;
             _props.b;
           }
@@ -287,6 +287,7 @@ describe("@rock-solid/undestructure", () => {
         )
       ).toEqual(
         await normalize(/*javascript*/ `
+          import { createMemo as _createMemo } from "solid-js";
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -297,11 +298,12 @@ describe("@rock-solid/undestructure", () => {
               {
                 a: "a",
                 get b() {
-                  return _props.a;
+                  return _b();
                 },
               },
               _props,
             );
+            const _b = _createMemo(() => _props.a);
             _props.a;
             _props.b;
           }
@@ -784,6 +786,7 @@ describe("@rock-solid/undestructure", () => {
       ).toEqual(
         await normalize(/*javascript*/ `
           import { splitProps as _splitProps } from "solid-js";
+          import { createMemo as _createMemo } from "solid-js";
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -799,9 +802,10 @@ describe("@rock-solid/undestructure", () => {
             _props = _mergeProps({
               a: "a",
               get b() {
-                return _props.a;
+                return _b();
               },
              }, _props);
+            const _b = _createMemo(() => _props.a);
             _props.a;
             _props.b;
             rest;

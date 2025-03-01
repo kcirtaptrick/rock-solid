@@ -123,6 +123,7 @@ function babelPluginUndestructure(
           "solid-js"
         );
 
+      const memos: types.VariableDeclaration[] = [];
       insertStatments(
         types.expressionStatement(
           types.assignmentExpression(
@@ -138,18 +139,51 @@ function babelPluginUndestructure(
                     )
                   )
                     return types.objectProperty(key, value);
+
+                  // Memoize derived defaults, useful for scenarios like `id =
+                  // createid()` where referencing id multiple times would
+                  // otherwise create multiple ids
+                  const createMemoSpecifier =
+                    UProgram.Path.importSpecifier.mut.findOrInsert(
+                      program,
+                      "createMemo",
+                      "solid-js"
+                    );
+                  const memoIdentifier = program.scope.generateUidIdentifier(
+                    key.type === "StringLiteral" ? key.value : key.name
+                  );
+                  memos.push(
+                    types.variableDeclaration("const", [
+                      types.variableDeclarator(
+                        memoIdentifier,
+                        types.callExpression(createMemoSpecifier.local, [
+                          types.arrowFunctionExpression([], value),
+                        ])
+                      ),
+                    ])
+                  );
+                  // Derive default when default contains identifier, without
+                  // this reactivity will be lost
                   return types.objectMethod(
                     "get",
                     key,
                     [],
-                    types.blockStatement([types.returnStatement(value)])
+                    types.blockStatement([
+                      types.returnStatement(
+                        types.callExpression(memoIdentifier, [])
+                      ),
+                    ])
                   );
                 })
               ),
               propsIdentifier,
             ])
           )
-        )
+        ),
+        // Memos must come last because they are eagerly evaluated, derived
+        // default get properties are lazy so they can reference the memos
+        // anyways
+        ...memos
       );
     }
 
