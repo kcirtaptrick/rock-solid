@@ -1,5 +1,4 @@
 import { types } from "@babel/core";
-import UObjectProperty from "./UObjectProperty";
 
 namespace UObjectPattern {
   export const defaults = (objectPattern: types.ObjectPattern) =>
@@ -13,10 +12,9 @@ namespace UObjectPattern {
     );
 
   const initialInfo = {
-    keys: () => [] as (types.Identifier | types.StringLiteral)[],
-    defaults: () =>
-      [] as [types.Identifier | types.StringLiteral, types.Expression][],
-    renames: () => ({}) as Record<string, types.Identifier>,
+    keys: () => [] as types.Expression[],
+    defaults: () => [] as [types.Expression, types.Expression][],
+    renames: () => new Map<types.ObjectProperty["key"], types.Identifier>(),
     restElement: () => null as types.RestElement | null,
   };
 
@@ -35,32 +33,28 @@ namespace UObjectPattern {
         if ("restElement" in res) res.restElement = prop;
         continue;
       }
-      const { key, value } = prop;
+      const { key: _key, value, computed } = prop;
+      // Replace non-computed identifiers with string literals to be able to
+      // identify non-computed keys; identifiers can be both.
+      const key =
+        !computed && _key.type === "Identifier"
+          ? types.stringLiteral(_key.name)
+          : _key;
 
-      UObjectProperty.Key.isStatic.assert(key, "Non-static key not supported.");
-      const keyName = UObjectProperty.Key.staticName(key);
+      if (key.type === "PrivateName")
+        throw new Error("Field cannot be a private name.");
 
-      res.keys?.push(key);
+      res.keys?.push(key as types.Expression);
 
-      if (value.type !== "AssignmentPattern") {
-        if (
-          res.renames &&
-          value.type === "Identifier" &&
-          value.name !== keyName
-        )
-          res.renames[keyName] = value;
+      if (value.type !== "AssignmentPattern" && value.type === "Identifier") {
+        res.renames?.set(key, value);
         continue;
       }
 
       if (value.type === "AssignmentPattern") {
         if (res.defaults) res.defaults.push([key, value.right]);
 
-        if (
-          res.renames &&
-          value.left.type === "Identifier" &&
-          value.left.name !== keyName
-        )
-          res.renames[keyName] = value.left;
+        if (value.left.type === "Identifier") res.renames?.set(key, value.left);
       }
     }
 

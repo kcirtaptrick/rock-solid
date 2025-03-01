@@ -5,7 +5,6 @@ import UBinding from "./UBinding";
 import UFunctionLike from "./UFunctionLike";
 import UNodePath from "./UNodePath";
 import UObjectPattern from "./UObjectPattern";
-import UObjectProperty from "./UObjectProperty";
 import UTypeAnnotation from "./UTypeAnnotation";
 import UTSType from "./UTSType";
 import UProgram from "./UProgram";
@@ -150,7 +149,7 @@ function babelPluginUndestructure(
                       "solid-js"
                     );
                   const memoIdentifier = program.scope.generateUidIdentifier(
-                    key.type === "StringLiteral" ? key.value : key.name
+                    key.type === "StringLiteral" ? key.value : undefined
                   );
                   memos.push(
                     types.variableDeclaration("const", [
@@ -206,11 +205,7 @@ function babelPluginUndestructure(
             types.arrayPattern([propsIdentifier, restElement.argument]),
             types.callExpression(splitPropsSpecifier.local, [
               propsIdentifier,
-              types.arrayExpression(
-                keys.map((key) =>
-                  types.stringLiteral(UObjectProperty.Key.staticName(key))
-                )
-              ),
+              types.arrayExpression(keys),
             ])
           )
         )
@@ -218,20 +213,27 @@ function babelPluginUndestructure(
     }
 
     // Transform references
-    for (const prop of keys) {
+    for (const key of keys) {
+      // Use non-computed member expression syntax where possible:
+      // `props.a` instead of `props["a"]`
+      const [member, shortHand] =
+        key.type === "StringLiteral" && /^\w+$/i.test(key.value)
+          ? [types.identifier(key.value), true]
+          : [key, false];
       const undestructuredProp = types.memberExpression(
         propsIdentifier,
-        prop,
-        prop.type === "StringLiteral"
+        member,
+        !shortHand
       );
 
       // Find new bindings for identifiers added in transforms above
       // - Derived defaults
       path.scope.crawl();
       const componentScopeBindings = path.scope.bindings;
-      const keyName = UObjectProperty.Key.staticName(prop);
       const { referencePaths, constantViolations } =
-        componentScopeBindings[renames[keyName]?.name || keyName]!;
+        componentScopeBindings[
+          renames.get(key)?.name || (key as types.StringLiteral).value
+        ]!;
 
       for (const referencePath of referencePaths)
         referencePath.replaceWith(undestructuredProp);

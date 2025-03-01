@@ -436,7 +436,7 @@ describe("@rock-solid/undestructure", () => {
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
           
-          export default function Component({ ["a"]: a, ["b-b"]: b, ["c.c"]: c }: D<{a: string, "b-b": string, "c.c": string}>) {
+          export default function Component({ "a": a, "b-b": b, "c.c": c }: D<{a: string, "b-b": string, "c.c": string}>) {
             a;
             b;
             c;
@@ -448,15 +448,34 @@ describe("@rock-solid/undestructure", () => {
         import { D } from "@rock-solid/undestructure";
         
         export default function Component(_props: D<{a: string, "b-b": string, "c.c": string}>) {
-          _props["a"];
+          _props.a;
           _props["b-b"];
           _props["c.c"];
         }
       `)
     );
   });
-  test("Dynamic key throws", async () => {
-    expect(async () => {
+  test("Computed key", async () => {
+    await expect(
+      await normalize(
+        (await tsTransform(/*javascript*/ `
+          import { D } from "@rock-solid/undestructure";
+          
+          export default function Component({ [a]: a }: D<{ab: string}>) {
+            a;
+          }
+        `))!.code!
+      )
+    ).toEqual(
+      await normalize(/*javascript*/ `
+        import { D } from "@rock-solid/undestructure";
+        
+        export default function Component(_props: D<{ab: string}>) {
+          _props[a];
+        }
+      `)
+    );
+    await expect(
       await normalize(
         (await tsTransform(/*javascript*/ `
           import { D } from "@rock-solid/undestructure";
@@ -465,8 +484,16 @@ describe("@rock-solid/undestructure", () => {
             a;
           }
         `))!.code!
-      );
-    }).rejects.toThrow();
+      )
+    ).toEqual(
+      await normalize(/*javascript*/ `
+        import { D } from "@rock-solid/undestructure";
+        
+        export default function Component(_props: D<{ab: string}>) {
+          _props["a" + "b"];
+        }
+      `)
+    );
   });
   test("All at once", async () => {
     expect(
