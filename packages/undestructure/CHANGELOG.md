@@ -1,5 +1,15 @@
 # @rock-solid/undestructure
 
+## 0.5.0
+
+### Minor Changes
+
+- ac19213: Memoize derived defaults to improve create\* behavior in defaults
+
+### Patch Changes
+
+- 2cf1e0f: Fix derived default bindings
+
 ## 0.4.0
 
 ### Minor Changes
