@@ -250,7 +250,7 @@ describe("@rock-solid/undestructure", () => {
         )
       ).toEqual(
         await normalize(/*javascript*/ `
-          import { createMemo as _createMemo } from "solid-js";
+          import { createLazyMemo as _createLazyMemo } from "@solid-primitives/memo";
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -266,7 +266,7 @@ describe("@rock-solid/undestructure", () => {
               },
               _props,
             );
-            const _b = _createMemo(() => _props.a);
+            const _b = _createLazyMemo(() => _props.a);
             _props.a;
             _props.b;
           }
@@ -287,7 +287,7 @@ describe("@rock-solid/undestructure", () => {
         )
       ).toEqual(
         await normalize(/*javascript*/ `
-          import { createMemo as _createMemo } from "solid-js";
+          import { createLazyMemo as _createLazyMemo } from "@solid-primitives/memo";
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -303,7 +303,7 @@ describe("@rock-solid/undestructure", () => {
               },
               _props,
             );
-            const _bC = _createMemo(() => _props.a);
+            const _bC = _createLazyMemo(() => _props.a);
             _props.a;
             _props[b + c];
           }
@@ -813,7 +813,7 @@ describe("@rock-solid/undestructure", () => {
       ).toEqual(
         await normalize(/*javascript*/ `
           import { splitProps as _splitProps } from "solid-js";
-          import { createMemo as _createMemo } from "solid-js";
+          import { createLazyMemo as _createLazyMemo } from "@solid-primitives/memo";
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -832,7 +832,7 @@ describe("@rock-solid/undestructure", () => {
                 return _b();
               },
              }, _props);
-            const _b = _createMemo(() => _props.a);
+            const _b = _createLazyMemo(() => _props.a);
             _props.a;
             _props.b;
             rest;

@@ -146,8 +146,8 @@ function babelPluginUndestructure(
                   const createMemoSpecifier =
                     UProgram.Path.importSpecifier.mut.findOrInsert(
                       program,
-                      "createMemo",
-                      "solid-js"
+                      "createLazyMemo",
+                      "@solid-primitives/memo"
                     );
                   const memoIdentifier = program.scope.generateUidIdentifier(
                     key.type === "StringLiteral"
