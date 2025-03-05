@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.5.3
+
+### Patch Changes
+
+- 104847a: Lazily evaluate derived default
+
 ## 0.5.2
 
 ### Patch Changes
