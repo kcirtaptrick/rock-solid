@@ -250,7 +250,7 @@ describe("@rock-solid/undestructure", () => {
         )
       ).toEqual(
         await normalize(/*javascript*/ `
-          import { createLazyMemo as _createLazyMemo } from "@solid-primitives/memo";
+          import { createLazyMemo as _createLazyMemo } from "@rock-solid/undestructure/runtime/lazyMemo";
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -287,7 +287,7 @@ describe("@rock-solid/undestructure", () => {
         )
       ).toEqual(
         await normalize(/*javascript*/ `
-          import { createLazyMemo as _createLazyMemo } from "@solid-primitives/memo";
+          import { createLazyMemo as _createLazyMemo } from "@rock-solid/undestructure/runtime/lazyMemo";
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           
@@ -813,7 +813,7 @@ describe("@rock-solid/undestructure", () => {
       ).toEqual(
         await normalize(/*javascript*/ `
           import { splitProps as _splitProps } from "solid-js";
-          import { createLazyMemo as _createLazyMemo } from "@solid-primitives/memo";
+          import { createLazyMemo as _createLazyMemo } from "@rock-solid/undestructure/runtime/lazyMemo";
           import { mergeProps as _mergeProps } from "solid-js";
           import { D } from "@rock-solid/undestructure";
           

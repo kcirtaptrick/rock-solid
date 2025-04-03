@@ -147,7 +147,7 @@ function babelPluginUndestructure(
                     UProgram.Path.importSpecifier.mut.findOrInsert(
                       program,
                       "createLazyMemo",
-                      "@solid-primitives/memo"
+                      "@rock-solid/undestructure/runtime/lazyMemo"
                     );
                   const memoIdentifier = program.scope.generateUidIdentifier(
                     key.type === "StringLiteral"
