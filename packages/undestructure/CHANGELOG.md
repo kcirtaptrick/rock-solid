@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.5.4
+
+### Patch Changes
+
+- aef0d9d: Rollup/vite plugin name: babel -> @rock-solid/undestructure
+
 ## 0.5.3
 
 ### Patch Changes
