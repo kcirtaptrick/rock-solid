@@ -1,6 +1,6 @@
 {
   "name": "@rock-solid/undestructure",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Destructuring props in SolidJS",
   "scripts": {
     "prepublish": "tsup; cp ./src/global.d.ts ./dist",

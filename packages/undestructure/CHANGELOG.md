@@ -1,5 +1,11 @@
 # @rock-solid/undestructure
 
+## 0.5.5
+
+### Patch Changes
+
+- 20466d7: Include createLazyMemo in bundle
+
 ## 0.5.4
 
 ### Patch Changes
