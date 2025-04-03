@@ -267,6 +267,7 @@ babelPluginUndestructure.rollup = (
       babelHelpers: "bundled",
     }),
     {
+      name: "@rock-solid/undestructure",
       enforce: "pre" as const,
     }
   );
